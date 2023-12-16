@@ -1,0 +1,28 @@
+[package]
+name = "AdventRust2023"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+
+[[bin]]
+name = "2023-06"
+path = "src/2023/06/main.rs"
+
+[[bin]]
+name = "2023-08"
+path = "src/2023/08/main.rs"
+
+[[bin]]
+name = "2023-09"
+path = "src/2023/09/main.rs"
+
+[[bin]]
+name = "2023-10"
+path = "src/2023/10/main.rs"
+
+[[bin]]
+name = "2023-11"
+path = "src/2023/11/main.rs"
