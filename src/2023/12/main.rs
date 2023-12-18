@@ -8,8 +8,8 @@ use std::{env, usize};
 #[derive(Debug)]
 struct Schema {
     springs: String,
-    sequences: Vec<u32>,
-    cache: HashMap<(String, Vec<u32>), u32>,
+    sequences: Vec<u128>,
+    cache: HashMap<(String, Vec<u128>), u128>,
 }
 
 impl Schema {
@@ -22,7 +22,7 @@ impl Schema {
         format!("{} {}", new_springs, new_sequences)
     }
 
-    fn count(&mut self, cfg: String, nums: Vec<u32>) -> u32 {
+    fn count(&mut self, cfg: String, nums: Vec<u128>) -> u128 {
         if cfg.is_empty() {
             if nums.is_empty() {
                 return 1;
@@ -52,9 +52,9 @@ impl Schema {
             );
         }
         if "#?".contains(cfg.clone().chars().next().unwrap()) {
-            if (nums[0] <= cfg.len() as u32)
+            if (nums[0] <= cfg.len() as u128)
                 && cfg.clone().chars().take(nums[0] as usize).all(|x| x != '.')
-                && (nums[0] == cfg.len() as u32
+                && (nums[0] == cfg.len() as u128
                     || cfg
                         .clone()
                         .chars()
@@ -73,7 +73,7 @@ impl Schema {
         result
     }
 
-    fn run(&mut self) -> u32 {
+    fn run(&mut self) -> u128 {
         self.count(self.springs.clone(), self.sequences.clone())
     }
 }
@@ -87,7 +87,7 @@ impl From<&str> for Schema {
                 .last()
                 .unwrap()
                 .split(',')
-                .map(|i| i.parse::<u32>().unwrap())
+                .map(|i| i.parse::<u128>().unwrap())
                 .collect(),
             cache: HashMap::new(),
         }
@@ -95,7 +95,7 @@ impl From<&str> for Schema {
 }
 
 #[tracing::instrument]
-fn part_one(file: &str) -> u32 {
+fn part_one(file: &str) -> u128 {
     file.par_lines()
         .map(|springs| springs.into())
         .map(|mut schema: Schema| schema.run())
@@ -103,7 +103,7 @@ fn part_one(file: &str) -> u32 {
 }
 
 #[tracing::instrument]
-fn part_two(file: &str) -> u32 {
+fn part_two(file: &str) -> u128 {
     file.par_lines()
         .map(|line| Schema::fold(line, 5))
         .map(|springs| springs.as_str().into())
