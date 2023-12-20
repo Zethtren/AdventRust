@@ -3,6 +3,7 @@ use std::collections::HashMap;
 use std::env;
 
 use std::fs::read_to_string;
+use std::time::Instant;
 
 use itertools::Itertools;
 
@@ -10,34 +11,34 @@ use itertools::Itertools;
 enum Rules {
     Normal,
     Joker,
-    Joker2,
 }
 
-fn compare_cards(a: &str, b: &str, rules: Rules) -> Ordering {
-    let mut a_map: HashMap<char, u32> = HashMap::new();
-    a.chars().for_each(|c| *a_map.entry(c).or_insert(0) += 1);
-
-    let mut b_map: HashMap<char, u32> = HashMap::new();
-    b.chars().for_each(|c| *b_map.entry(c).or_insert(0) += 1);
-
-    if rules == Rules::Joker {
-        if let Some(a_j) = a_map.remove(&'J') {
-            if let Some((&a_big, _)) = a_map.iter().sorted_by(|a, b| b.1.cmp(a.1)).next() {
-                *a_map.entry(a_big).or_insert(0) += a_j;
-            }
-        }
-        if let Some(b_j) = b_map.remove(&'J') {
-            if let Some((&b_big, _)) = b_map.iter().sorted_by(|a, b| b.1.cmp(a.1)).next() {
-                *b_map.entry(b_big).or_insert(0) += b_j;
+fn make_card_map(cards: &str, rule: Rules) -> HashMap<char, u64> {
+    let mut map: HashMap<char, u64> = HashMap::new();
+    cards.chars().for_each(|c| *map.entry(c).or_insert(0) += 1);
+    if rule == Rules::Joker {
+        if let Some(j) = map.remove(&'J') {
+            if let Some((&big, _)) = map.iter().sorted_by(|a, b| b.1.cmp(a.1)).next() {
+                *map.entry(big).or_insert(0) += j;
+            } else {
+                map.insert('J', 5);
             }
         }
     }
+    map
+}
+
+fn order_by_hand_type(a: &str, b: &str, rule: Rules) -> Ordering {
+    let a_map = make_card_map(a, rule);
+    let b_map = make_card_map(b, rule);
 
     let mut sorting = Ordering::Equal;
+
     let hand_type = a_map
         .iter()
         .sorted_by(|a, b| b.1.cmp(a.1))
         .zip(b_map.iter().sorted_by(|a, b| b.1.cmp(a.1)));
+
     for ((_, a), (_, b)) in hand_type {
         match a.cmp(b) {
             Ordering::Equal => {
@@ -49,15 +50,18 @@ fn compare_cards(a: &str, b: &str, rules: Rules) -> Ordering {
             }
         }
     }
+    sorting
+}
+
+fn compare_cards(a: &str, b: &str, rules: Rules) -> Ordering {
     let cards = match rules {
-        Rules::Joker | Rules::Joker2 => "AKQT98765432J",
+        Rules::Joker => "AKQT98765432J",
         Rules::Normal => "AKQJT98765432",
     };
 
+    let mut sorting = order_by_hand_type(a, b, rules);
+
     if sorting == Ordering::Equal {
-        if rules == Rules::Joker {
-            sorting = compare_cards(a, b, Rules::Joker2)
-        };
         for (a, b) in a.chars().zip(b.chars()) {
             match cards.find(b).unwrap().cmp(&cards.find(a).unwrap()) {
                 Ordering::Equal => {
@@ -70,7 +74,11 @@ fn compare_cards(a: &str, b: &str, rules: Rules) -> Ordering {
             }
         }
     }
-    sorting
+    if rules == Rules::Joker && sorting == Ordering::Equal {
+        order_by_hand_type(a, b, Rules::Normal)
+    } else {
+        sorting
+    }
 }
 
 fn get_hands(input: &str) -> Vec<(&str, u64)> {
@@ -110,8 +118,19 @@ fn main() {
     let path = args.remove(0);
     let input = read_to_string(path).unwrap();
 
-    println!("Part 1: {}", part_one(&input));
-    println!("Part 2: {}", part_two(&input));
+    let mut start = Instant::now();
+    println!(
+        "Part 1: {}, Elapsed: {:?}",
+        part_one(&input),
+        start.elapsed()
+    );
+
+    start = Instant::now();
+    println!(
+        "Part 2: {}, Elapsed: {:?}",
+        part_two(&input),
+        start.elapsed()
+    );
 }
 
 #[cfg(test)]
