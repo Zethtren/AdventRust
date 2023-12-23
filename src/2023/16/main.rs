@@ -1,3 +1,4 @@
+use rayon::prelude::*;
 use std::collections::HashMap;
 use std::env;
 use std::fs::read_to_string;
@@ -84,7 +85,7 @@ fn part_two(file: &str) -> u128 {
     ];
 
     starts
-        .into_iter()
+        .into_par_iter()
         .map(|(x_s, y_s, dir)| {
             let grid: Grid = Arc::new(Mutex::new(HashMap::new()));
             file.split('\n').enumerate().for_each(|(y, line)| {
