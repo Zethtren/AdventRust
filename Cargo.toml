@@ -10,9 +10,30 @@ overflow-checks = true
 [dependencies]
 cached = "0.46.1"
 itertools = "0.12.0"
+md5 = "0.7.0"
 rayon = "1.8.0"
 tracing = "0.1.40"
 tracing-subscriber = "0.3.18"
+
+[[bin]]
+name = "2015-01"
+path = "src/2015/01/main.rs"
+
+[[bin]]
+name = "2015-02"
+path = "src/2015/02/main.rs"
+
+[[bin]]
+name = "2015-03"
+path = "src/2015/03/main.rs"
+
+[[bin]]
+name = "2015-04"
+path = "src/2015/04/main.rs"
+
+[[bin]]
+name = "2015-05"
+path = "src/2015/05/main.rs"
 
 [[bin]]
 name = "2023-06"
