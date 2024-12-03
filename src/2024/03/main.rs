@@ -8,16 +8,34 @@ use lazy_static::lazy_static;
 
 lazy_static! {
     static ref mul_regex: Regex = Regex::new(r"mul\(([0-9]+),([0-9]+)\)").expect("Should be valid.");
+    static ref mul_do_regex: Regex = Regex::new(r"mul\(([0-9]+),([0-9]+)\)|(don\'t)(\(\))|(do)(\(\))").expect("Should be valid.");
 }
 
 fn part_one(file: &str) -> i128 {
     let data = file.replace('\n', "");
-    mul_regex.captures_iter(&data).map(|c| c.extract()).map(|(_, [left, right])| left.parse::<i128>().expect("Won't fail") * right.parse::<i128>().expect("Won't fail") ).sum()
+    mul_regex.captures_iter(&data).map(|c| c.extract()).map(|(i, [left, right])| {
+        left.parse::<i128>().expect("Won't fail") * right.parse::<i128>().expect("Won't fail") 
+    }).sum()
 }
 
 fn part_two(file: &str) -> i128 {
-    0
+    let mut sum = 0;
+    let mut add = true;
+    let data = file.replace('\n', "");
+    mul_do_regex.captures_iter(&data).map(|c| c.extract()).for_each(|(i, [left, right])| {
+        if left == "do" {
+            add = true;
+        } else if left == "don't" {
+            add = false;
+        } else {
+            if add {
+                sum = sum + left.parse::<i128>().expect("Won't fail") * right.parse::<i128>().expect("Won't fail") 
+            }
+        }
+    });
+    sum
 }
+
 
 fn main() {
     let mut args: Vec<String> = env::args().skip(1).collect();
