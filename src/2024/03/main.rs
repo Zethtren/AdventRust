@@ -13,7 +13,7 @@ lazy_static! {
 
 fn part_one(file: &str) -> i128 {
     let data = file.replace('\n', "");
-    mul_regex.captures_iter(&data).map(|c| c.extract()).map(|(i, [left, right])| {
+    mul_regex.captures_iter(&data).map(|c| c.extract()).map(|(_, [left, right])| {
         left.parse::<i128>().expect("Won't fail") * right.parse::<i128>().expect("Won't fail") 
     }).sum()
 }
@@ -22,7 +22,7 @@ fn part_two(file: &str) -> i128 {
     let mut sum = 0;
     let mut add = true;
     let data = file.replace('\n', "");
-    mul_do_regex.captures_iter(&data).map(|c| c.extract()).for_each(|(i, [left, right])| {
+    mul_do_regex.captures_iter(&data).map(|c| c.extract()).for_each(|(_, [left, right])| {
         if left == "do" {
             add = true;
         } else if left == "don't" {
@@ -50,6 +50,7 @@ fn main() {
 #[cfg(test)]
 mod test {
     static TST: &str = "xmul(2,4)%&mul[3,7]!@^do_not_mul(5,5)+mul(32,64]then(mul(11,8)mul(8,5))";
+    static TST2: &str = "xmul(2,4)&mul[3,7]!^don't()_mul(5,5)+mul(32,64](mul(11,8)undo()?mul(8,5))";
 
     use super::{part_one, part_two};
 
@@ -60,7 +61,7 @@ mod test {
 
     #[test]
     fn test_part_two() {
-        assert_eq!(part_two(TST), 4);
+        assert_eq!(part_two(TST2), 48);
     }
 }
 
