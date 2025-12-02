@@ -1,3 +1,4 @@
+use rayon::prelude::*;
 use std::collections::BTreeSet;
 use std::env;
 use std::fs::read_to_string;
@@ -6,6 +7,7 @@ use std::time::Instant;
 fn part_one(file: &str) -> i128 {
     file.trim()
         .split(',')
+        .par_bridge()
         .map(|x| x.split_once('-').unwrap())
         .map(|(low, upp)| {
             ((low.parse::<i128>().unwrap())..=(upp.parse::<i128>().unwrap()))
@@ -24,6 +26,7 @@ fn part_one(file: &str) -> i128 {
 fn part_two(file: &str) -> i128 {
     file.trim()
         .split(',')
+        .par_bridge()
         .map(|x| x.split_once('-').unwrap())
         .map(|(low, upp)| {
             ((low.parse::<i128>().unwrap())..=(upp.parse::<i128>().unwrap()))
